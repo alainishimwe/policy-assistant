@@ -1,0 +1,43 @@
+.container {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 24px;
+    font-family: Arial, sans-serif;
+    color: #1e293b;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input {
+    padding: 14px;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+button {
+    align-self: flex-start;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background: #1d4ed8;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.answer {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 8px;
+    background: #eff6ff;
+}

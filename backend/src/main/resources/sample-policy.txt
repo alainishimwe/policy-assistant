@@ -1,0 +1,24 @@
+FICTIONAL AUTO INSURANCE POLICY
+Policy number: DEMO-001
+For portfolio demonstration only.
+
+SECTION 1 — COLLISION COVERAGE
+Collision coverage pays for covered damage to your vehicle
+resulting from a collision. The collision deductible is $500.
+
+SECTION 2 — COMPREHENSIVE COVERAGE
+Comprehensive coverage pays for covered damage from theft,
+fire, vandalism, and hail. The comprehensive deductible is $250.
+
+SECTION 3 — RENTAL REIMBURSEMENT
+Following a covered claim, rental reimbursement pays up to
+$40 per day for a maximum of 30 days.
+
+SECTION 4 — EXCLUSIONS
+This sample policy excludes intentional damage and use of
+the vehicle for paid rideshare services.
+
+SECTION 5 — CLAIM DOCUMENTS
+To submit a claim, provide your policy number, the incident
+date, a description of the incident, and photos of the damage.
+Provide a police report if one is available.

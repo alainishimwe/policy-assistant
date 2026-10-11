@@ -1,0 +1,32 @@
+<main class="container">
+  <h1>Insurance Policy Assistant</h1>
+
+  <p>Ask a question about our sample auto insurance policy</p>
+
+  <form (ngSubmit)="askQuestion()">
+    <label for="question">Your question</label>
+
+    <input
+       id="question"
+       name="question"
+       type="text"
+       [(ngModel)]="question"
+       placeholder="What is my collision deductible?"
+    />
+
+    <button type="submit" [disabled]="!question.trim() || loading">
+      {{loading ? 'Asking...' : 'Ask'}}
+    </button>
+  </form>
+
+  @if (error) {
+    <p role="alert">{{ error }}</p>
+  }
+
+  @if (answer) {
+    <section class="answer" aria-live="polite">
+      <h2>Answer</h2>
+      <p>{{ answer }}</p>
+    </section>
+  }
+</main>
