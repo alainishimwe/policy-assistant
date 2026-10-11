@@ -1,5 +1,8 @@
 package com.alain.policyassistant.service;
 
+import java.time.Duration;
+import com.alain.policyassistant.exception.AiUnavailableException;
+import com.openai.errors.OpenAIException;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.responses.Response;
@@ -13,7 +16,11 @@ public class AiService {
     private final OpenAIClient client;
 
     public AiService() {
-        client = OpenAIOkHttpClient.fromEnv();
+        client = OpenAIOkHttpClient.builder()
+                .fromEnv()
+                .timeout(Duration.ofSeconds(20))
+                .maxRetries(0)
+                .build();
     }
 
     public String generateAnswer(String prompt) {
@@ -24,7 +31,14 @@ public class AiService {
                 .store(false)
                 .build();
 
-        Response response = client.responses().create(params);
+    
+        Response response;
+
+        try {
+            response = client.responses().create(params);
+        } catch (OpenAIException exception) {
+            throw new AiUnavailableException(exception);
+        }
 
         StringBuilder answer = new StringBuilder();
 

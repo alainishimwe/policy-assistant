@@ -32,8 +32,11 @@ export class App {
         this.answer = response.answer;
         this.loading = false;
       },
-      error: () => {
-        this.error = "Could not get an answer. Please try again.";
+      error: (err) => {
+        this.error =
+          err.status === 503
+            ? "Could not get an answer. Please try again."
+            : 'Could not get an anwer. Please try again'
         this.loading = false;
       }
     });
