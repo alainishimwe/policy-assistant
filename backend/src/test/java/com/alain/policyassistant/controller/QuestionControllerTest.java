@@ -17,6 +17,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.mockito.Mockito.verifyNoInteractions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
 @WebMvcTest(QuestionController.class)
 @Import(GlobalExceptionHandler.class)
 class QuestionControllerTest {
@@ -64,5 +68,42 @@ class QuestionControllerTest {
                             "We couldn't generate an answer right now. "
                             + "Please try again later."
                         ));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{}",
+            "{\"question\":null}",
+            "{\"question\":\"\"}",
+            "{\"question\":\"   \"}"
+    })
+    void rejectsMissingOrBlankQuestion(String requestBody)
+            throws Exception {
+
+        mockMvc.perform(post("/api/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("Please enter a question."));
+
+        verifyNoInteractions(policyService);
+    }
+
+    @Test
+    void rejectsQuestionOver1000Characters() throws Exception {
+        String question = "a".repeat(1001);
+        String requestBody = "{\"question\":\"" + question + "\"}";
+
+        mockMvc.perform(post("/api/questions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value(
+                            "Please keep your question to 1,000 characters or fewer."
+                        ));
+
+        verifyNoInteractions(policyService);
     }
 }
