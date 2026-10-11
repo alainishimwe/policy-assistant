@@ -33,10 +33,16 @@ export class App {
         this.loading = false;
       },
       error: (err) => {
-        this.error =
-          err.status === 503
-            ? "Could not get an answer. Please try again."
-            : 'Could not get an anwer. Please try again'
+        if (err.status === 400) {
+          this.error =
+            err.error?.message ?? 'Please check your question.';
+        } else if (err.status === 503) {
+          this.error =
+            "We couldn't generate an answer right now. Please try again later.";
+        } else {
+          this.error = 'Could not get an answer. Please try again.';
+        }
+
         this.loading = false;
       }
     });
