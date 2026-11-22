@@ -8,10 +8,26 @@ import java.util.Locale;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class PolicyService {
 
-    private final String policyText;
+    private static final Logger log = LoggerFactory.getLogger(PolicyService.class);
+    private static final int MAX_RETRIEVED_SECTIONS = 2;
+    private final String policyHeader;
+    private final List<String> policySections;
+    private List<EmbeddedSection> embeddedSections;
+    private record EmbeddedSection(String text, List<Float> embedding) {}
+    private record RankedSection(String text, double similarity) {}
+
+
+    // private final String policyText;
     private final AiService aiService;
 
     public PolicyService(AiService aiService) throws IOException {
@@ -19,11 +35,19 @@ public class PolicyService {
         ClassPathResource resource = 
                 new ClassPathResource("sample-policy.txt");
         
-        try (InputStream input = resource.getInputStream()){
-            policyText = new String(
-                input.readAllBytes(),
-                StandardCharsets.UTF_8
-            );
+        try (InputStream input = resource.getInputStream()) {
+            String policyText = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+
+            String[] parts = policyText.split("(?m)(?=^SECTION \\d+ — )");
+
+            if (parts.length < 2) {
+                throw new IllegalStateException("No sections found in sample-policy.txt");
+            }
+
+            policyHeader = parts[0].strip();
+            policySections = Arrays.stream(parts, 1, parts.length)
+                    .map(String::strip)
+                    .toList();
         }
     }
 

@@ -10,9 +10,16 @@ import com.openai.models.responses.ResponseCreateParams;
 
 import org.springframework.stereotype.Service;
 
+import com.openai.errors.OpenAIServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.List;
+import com.openai.models.embeddings.EmbeddingCreateParams;
+
 @Service
 public class AiService {
 
+    private static final Logger log = LoggerFactory.getLogger(AiService.class);
     private final OpenAIClient client;
 
     public AiService() {
@@ -36,7 +43,13 @@ public class AiService {
 
         try {
             response = client.responses().create(params);
+        } catch (OpenAIServiceException exception) {
+            log.warn("OpenAI request failed with HTTP {} ({})",
+                exception.statusCode(), exception.getClass().getSimpleName());
+            throw new AiUnavailableException(exception);
         } catch (OpenAIException exception) {
+            log.warn("OpenAI request failed ({})",
+                exception.getClass().getSimpleName());
             throw new AiUnavailableException(exception);
         }
 
@@ -49,5 +62,28 @@ public class AiService {
                 .forEach(text -> answer.append(text.text()));
 
         return answer.toString();
+    }
+
+    public List<Float> embed(String text) {
+        EmbeddingCreateParams params = EmbeddingCreateParams.builder()
+                .model("text-embedding-3-small")
+                .input(text)
+                .build();
+
+        try {
+            return client.embeddings()
+                    .create(params)
+                    .data()
+                    .getFirst()
+                    .embedding();
+        } catch (OpenAIServiceException exception) {
+            log.warn("OpenAI embedding request failed with HTTP {} ({})",
+                    exception.statusCode(), exception.getClass().getSimpleName());
+            throw new AiUnavailableException(exception);
+        } catch (OpenAIException exception) {
+            log.warn("OpenAI embedding request failed ({})",
+                    exception.getClass().getSimpleName());
+            throw new AiUnavailableException(exception);
+        }
     }
 }
